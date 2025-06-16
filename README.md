@@ -1,6 +1,6 @@
 # Himosoft MockStation 🚀
 
-A powerful and elegant mock API server built with Next.js, designed to help developers test and prototype their applications with realistic API endpoints.
+
 
 🌐 **Live App**: [https://mockstation.himosoft.com.bd](https://mockstation.himosoft.com.bd)
 

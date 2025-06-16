@@ -3,72 +3,99 @@ import { apiStore } from '@/app/lib/api-store';
 
 function validateApiKey(request: NextRequest, id: string): boolean {
   const apiKey = request.headers.get('x-api-key');
-  console.log('Validating API key in route:', { id, apiKey });
-  if (!apiKey) return false;
-  return apiStore.validateApiKey(id, apiKey);
+  console.log('Validating API key in route:', { 
+    id, 
+    apiKey,
+    headers: Object.fromEntries(request.headers.entries())
+  });
+  if (!apiKey) {
+    console.log('No API key provided in headers');
+    return false;
+  }
+  const isValid = apiStore.validateApiKey(id, apiKey);
+  console.log('API key validation result:', { id, apiKey, isValid });
+  return isValid;
 }
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!validateApiKey(request, params.id)) {
-    return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-  }
-
-  const searchParams = request.nextUrl.searchParams;
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '5');
-
-  // Validate page and limit
-  if (isNaN(page) || page < 1) {
-    return NextResponse.json({ error: 'Invalid page number' }, { status: 400 });
-  }
-  if (isNaN(limit) || limit < 1) {
-    return NextResponse.json({ error: 'Invalid limit' }, { status: 400 });
-  }
-
-  const items = apiStore.getAllItems(params.id);
-
-  // Calculate pagination
-  const totalItems = items.length;
-  const totalPages = Math.ceil(totalItems / limit);
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedItems = items.slice(startIndex, endIndex);
-
-  return NextResponse.json({
-    items: paginatedItems,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalItems,
-      itemsPerPage: limit,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1
+  try {
+    const apiKey = request.headers.get('x-api-key');
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API key is required' },
+        { status: 401 }
+      );
     }
-  });
+
+    const instance = await apiStore.getInstanceByApiKey(apiKey);
+    if (!instance) {
+      return NextResponse.json(
+        { error: 'Invalid API key' },
+        { status: 401 }
+      );
+    }
+
+    const items = await apiStore.getAllItems(instance.id);
+    return NextResponse.json(items);
+  } catch (error) {
+    console.error('Error in GET /api/items/[id]:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!validateApiKey(request, params.id)) {
-    return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-  }
-
   try {
-    const data = await request.json();
-    console.log('Creating item:', { id: params.id, data });
-    const item = apiStore.createItem(params.id, data);
-    if (!item) {
-      return NextResponse.json({ error: 'Instance not found' }, { status: 404 });
+    const apiKey = request.headers.get('x-api-key');
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API key is required' },
+        { status: 401 }
+      );
     }
+
+    const instance = await apiStore.getInstanceByApiKey(apiKey);
+    if (!instance) {
+      return NextResponse.json(
+        { error: 'Invalid API key' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const item = await apiStore.createItem(instance.id, {
+      name: body.name,
+      description: body.description,
+      method: 'POST',
+      path: '/items',
+      response: body,
+      status: 200,
+      headers: {},
+      delay: 0
+    });
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Failed to create item' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(item);
   } catch (error) {
-    console.error('Error creating item:', error);
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    console.error('Error in POST /api/items/[id]:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -82,7 +109,11 @@ export async function PUT(
 
   try {
     const data = await request.json();
-    const updatedItem = apiStore.updateItem(params.id, data);
+    const itemId = data.id;
+    if (!itemId) {
+      return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
+    }
+    const updatedItem = apiStore.updateItem(params.id, itemId, data);
     
     if (!updatedItem) {
       return NextResponse.json({ error: 'Item not found' }, { status: 404 });
@@ -102,7 +133,14 @@ export async function DELETE(
     return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
   }
 
-  const success = apiStore.deleteItem(params.id);
+  const searchParams = request.nextUrl.searchParams;
+  const itemId = searchParams.get('itemId');
+  
+  if (!itemId) {
+    return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
+  }
+
+  const success = apiStore.deleteItem(params.id, itemId);
   if (!success) {
     return NextResponse.json({ error: 'Item not found' }, { status: 404 });
   }
