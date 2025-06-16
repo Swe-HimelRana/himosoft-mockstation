@@ -5,39 +5,72 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const searchParams = request.nextUrl.searchParams;
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '5');
-
-  // Validate page and limit
-  if (isNaN(page) || page < 1) {
-    return NextResponse.json({ error: 'Invalid page number' }, { status: 400 });
-  }
-  if (isNaN(limit) || limit < 1) {
-    return NextResponse.json({ error: 'Invalid limit' }, { status: 400 });
-  }
-
-  const items = apiStore.getAllItems(params.id);
-  if (!items) {
-    return NextResponse.json({ error: 'Instance not found' }, { status: 404 });
-  }
-
-  // Calculate pagination
-  const totalItems = items.length;
-  const totalPages = Math.ceil(totalItems / limit);
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedItems = items.slice(startIndex, endIndex);
-
-  return NextResponse.json({
-    items: paginatedItems,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalItems,
-      itemsPerPage: limit,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1
+  try {
+    const instance = await apiStore.getInstance(params.id);
+    if (!instance) {
+      return NextResponse.json(
+        { error: 'Instance not found' },
+        { status: 404 }
+      );
     }
-  });
+
+    const items = await apiStore.getAllItems(instance.id);
+    return NextResponse.json({
+      instance: {
+        id: instance.id,
+        name: instance.name,
+        description: instance.description
+      },
+      total: items.length,
+      items: items
+    });
+  } catch (error) {
+    console.error('Error in GET /api/public/items/[id]:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const instance = await apiStore.getInstance(params.id);
+    if (!instance) {
+      return NextResponse.json(
+        { error: 'Instance not found' },
+        { status: 404 }
+      );
+    }
+
+    const body = await request.json();
+    const item = await apiStore.createItem(instance.id, {
+      name: body.name,
+      description: body.description,
+      method: 'POST',
+      path: '/items',
+      response: body,
+      status: 200,
+      headers: {},
+      delay: 0
+    });
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Failed to create item' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(item);
+  } catch (error) {
+    console.error('Error in POST /api/public/items/[id]:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 } 
