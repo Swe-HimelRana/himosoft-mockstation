@@ -10,15 +10,15 @@ export interface WebhookLog {
   formData?: FormData;
 }
 
+type SubscriberCallback = (logs: WebhookLog[]) => void;
+
 class WebhookStore {
   private readonly LOG_MAX_AGE = 1000 * 60 * 60 * 24 * 3; // 3 days
   private readonly MAX_LOGS_PER_WEBHOOK = 100; // Keep only last 100 logs per webhook
-  private subscribers: Map<string, Set<(logs: WebhookLog[]) => void>>;
-  private lastLogIds: Map<string, Set<string>>;
+  private subscribers: Map<string, Set<SubscriberCallback>>;
 
   constructor() {
     this.subscribers = new Map();
-    this.lastLogIds = new Map();
   }
 
   private async cleanup() {
@@ -101,21 +101,22 @@ class WebhookStore {
     }
   }
 
-  subscribe(webhookId: string, callback: (logs: WebhookLog[]) => void) {
+  subscribe(webhookId: string, callback: SubscriberCallback): () => void {
     if (!this.subscribers.has(webhookId)) {
       this.subscribers.set(webhookId, new Set());
     }
     this.subscribers.get(webhookId)!.add(callback);
-  }
 
-  unsubscribe(webhookId: string, callback: (logs: WebhookLog[]) => void) {
-    const subscribers = this.subscribers.get(webhookId);
-    if (subscribers) {
-      subscribers.delete(callback);
-      if (subscribers.size === 0) {
-        this.subscribers.delete(webhookId);
+    // Return unsubscribe function
+    return () => {
+      const subscribers = this.subscribers.get(webhookId);
+      if (subscribers) {
+        subscribers.delete(callback);
+        if (subscribers.size === 0) {
+          this.subscribers.delete(webhookId);
+        }
       }
-    }
+    };
   }
 }
 

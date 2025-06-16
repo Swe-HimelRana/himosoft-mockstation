@@ -1,49 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
+import { NextRequest } from 'next/server';
 import { webhookStore } from '@/app/lib/webhook-store';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const { searchParams } = new URL(request.url);
-  const query = Object.fromEntries(searchParams.entries());
-  
-  const log = {
-    id: uuidv4(),
-    timestamp: new Date().toISOString(),
-    method: 'GET',
-    headers: Object.fromEntries(request.headers),
-    body: null,
-    query,
-  };
+async function handleRequest(request: NextRequest, method: string, params: { id: string }) {
+  try {
+    const headers = Object.fromEntries(request.headers.entries());
+    const query = Object.fromEntries(new URL(request.url).searchParams.entries());
+    const body = await request.text();
+    let parsedBody: any = {};
+    
+    try {
+      parsedBody = body ? JSON.parse(body) : {};
+    } catch (e) {
+      parsedBody = { raw: body };
+    }
 
-  webhookStore.addLog(params.id, log);
-  return NextResponse.json({ success: true });
+    const log = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      method,
+      headers,
+      body: parsedBody,
+      query,
+    };
+
+    await webhookStore.addLog(params.id, log);
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error(`Error handling webhook ${method} request:`, error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  return handleRequest(request, 'GET', params);
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const { searchParams } = new URL(request.url);
-  const query = Object.fromEntries(searchParams.entries());
-  
-  let body;
-  const contentType = request.headers.get('content-type') || '';
-  
-  if (contentType.includes('application/json')) {
-    body = await request.json();
-  } else if (contentType.includes('multipart/form-data')) {
-    const formData = await request.formData();
-    body = Object.fromEntries(formData.entries());
-  } else {
-    body = await request.text();
-  }
+  return handleRequest(request, 'POST', params);
+}
 
-  const log = {
-    id: uuidv4(),
-    timestamp: new Date().toISOString(),
-    method: 'POST',
-    headers: Object.fromEntries(request.headers),
-    body,
-    query,
-  };
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  return handleRequest(request, 'PUT', params);
+}
 
-  webhookStore.addLog(params.id, log);
-  return NextResponse.json({ success: true });
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  return handleRequest(request, 'PATCH', params);
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  return handleRequest(request, 'DELETE', params);
 } 

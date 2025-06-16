@@ -1,0 +1,72 @@
+### 🔧 Environment Variables
+@baseUrl = http://localhost:3000
+@instanceId = 431bfec3-a28f-42a3-a580-485b6772ca39
+@apiKey = temp_1dc1dbb9-9fca-4342-93aa-5a15670b7731
+@itemId = 28e2f5ca-2281-456c-9b76-cb594fd20964
+
+##############################################################
+### 🔐 Authenticated Private Endpoints (Require x-api-key)
+##############################################################
+
+### 🔹 Get All Items (Private)
+GET {{baseUrl}}/api/items/{{instanceId}}
+x-api-key: {{apiKey}}
+
+### 🔹 Get Single Item (Private)
+GET {{baseUrl}}/api/items/{{instanceId}}/{{itemId}}
+x-api-key: {{apiKey}}
+
+### 🔹 Create Item (Private)
+POST {{baseUrl}}/api/items/{{instanceId}}
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "name": "Example Item",
+  "description": "This is an example item"
+}
+
+### 🔹 Update Item (Private)
+PUT {{baseUrl}}/api/items/{{instanceId}}/{{itemId}}
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "name": "Updated Item",
+  "description": "welcome from himosoft"
+}
+
+### 🔹 Delete Item (Private)
+DELETE {{baseUrl}}/api/items/{{instanceId}}/{{itemId}}
+x-api-key: {{apiKey}}
+
+##############################################################
+### 🌐 Public Endpoints (No Authentication Required)
+##############################################################
+
+### 🔹 Get All Items (Public)
+GET {{baseUrl}}/api/public/items/{{instanceId}}
+
+### 🔹 Get Single Item (Public)
+GET {{baseUrl}}/api/public/items/{{instanceId}}/{{itemId}}
+
+### 🔹 Create Item (Public)
+POST {{baseUrl}}/api/public/items/{{instanceId}}
+Content-Type: application/json
+
+{
+  "name": "New Item",
+  "description": "Item Description"
+}
+
+### 🔹 Update Item (Public)
+PUT {{baseUrl}}/api/public/items/{{instanceId}}/{{itemId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "description": "Updated Description x"
+}
+
+### 🔹 Delete Item (Public)
+DELETE {{baseUrl}}/api/public/items/{{instanceId}}/{{itemId}}

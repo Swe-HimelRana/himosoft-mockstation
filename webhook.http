@@ -1,0 +1,84 @@
+### Variables
+@baseUrl = http://localhost:3000
+@webhookId = a196b184-d6ff-443f-ad1d-b2d6fc520ba0
+
+### 🔹 Get webhook info (should be GET only, no body allowed)
+GET {{baseUrl}}/api/webhook/{{webhookId}}
+Accept: application/json
+
+### 🔹 Update webhook (should be PUT or PATCH for updating)
+PUT {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Test Webhook",
+  "description": "An updated test webhook"
+}
+
+### 🔹 Test webhook with POST request
+POST {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: application/json
+
+{
+  "event": "test",
+  "data": {
+    "message": "Hello from webhook test",
+    "timestamp": "{{$datetime iso8601}}"
+  }
+}
+
+### 🔹 Test webhook with PUT request
+PUT {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: application/json
+
+{
+  "event": "update",
+  "data": {
+    "id": 123,
+    "status": "updated"
+  }
+}
+
+### 🔹 Test webhook with DELETE request
+DELETE {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: application/json
+
+{
+  "event": "delete",
+  "data": {
+    "id": 123
+  }
+}
+
+### 🔹 Test webhook with query parameters
+GET {{baseUrl}}/api/webhook/{{webhookId}}?event=test&source=api
+Accept: application/json
+
+### 🔹 Test webhook with custom headers
+POST {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: application/json
+X-Custom-Header: test-value
+Authorization: Bearer test-token
+
+{
+  "event": "test",
+  "data": {
+    "message": "Test with custom headers"
+  }
+}
+
+### 🔹 Test webhook with form-data
+# Note: This only works in tools that support multi-part bodies like Postman or REST Client extension in VSCode
+POST {{baseUrl}}/api/webhook/{{webhookId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+This is a test file content.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="message"
+
+Hello from form data
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

@@ -83,6 +83,68 @@
       "createdAt": "2025-06-16T21:04:18.362Z",
       "lastAccessedAt": "2025-06-16T21:04:18.416Z",
       "items": []
+    },
+    "9c7c82a3-c553-4ad5-849f-8326fa2ce415": {
+      "id": "9c7c82a3-c553-4ad5-849f-8326fa2ce415",
+      "name": "New Instance",
+      "description": "A new mock API instance",
+      "apiKey": "temp_1a47ccc5-348c-4591-b13d-2a6784a8ec93",
+      "createdAt": "2025-06-16T21:38:55.811Z",
+      "lastAccessedAt": "2025-06-16T21:38:56.197Z",
+      "items": []
+    },
+    "c1f4fc54-157c-4411-b1e3-43d947349c1a": {
+      "id": "c1f4fc54-157c-4411-b1e3-43d947349c1a",
+      "name": "New Instance",
+      "description": "A new mock API instance",
+      "apiKey": "temp_408665ca-5993-4976-aa7e-51e38902ca14",
+      "createdAt": "2025-06-16T21:41:22.384Z",
+      "lastAccessedAt": "2025-06-16T21:41:22.431Z",
+      "items": []
+    },
+    "1b01631b-10b2-4fae-8174-cfac75e6de5d": {
+      "id": "1b01631b-10b2-4fae-8174-cfac75e6de5d",
+      "name": "New Instance",
+      "description": "A new mock API instance",
+      "apiKey": "temp_d58f4a7e-e0ac-4c18-8bd6-df8130a2548e",
+      "createdAt": "2025-06-16T21:41:51.874Z",
+      "lastAccessedAt": "2025-06-16T21:41:51.933Z",
+      "items": []
+    },
+    "54d79615-9afa-4f85-8ece-f825c2eeb2a8": {
+      "id": "54d79615-9afa-4f85-8ece-f825c2eeb2a8",
+      "name": "New Instance",
+      "description": "A new mock API instance",
+      "apiKey": "temp_f57432fe-570e-4c7f-9aea-16c217b9b50e",
+      "createdAt": "2025-06-16T21:58:04.311Z",
+      "lastAccessedAt": "2025-06-16T21:58:04.364Z",
+      "items": []
+    },
+    "431bfec3-a28f-42a3-a580-485b6772ca39": {
+      "id": "431bfec3-a28f-42a3-a580-485b6772ca39",
+      "name": "New Instance",
+      "description": "A new mock API instance",
+      "apiKey": "temp_1dc1dbb9-9fca-4342-93aa-5a15670b7731",
+      "createdAt": "2025-06-16T22:00:10.806Z",
+      "lastAccessedAt": "2025-06-16T22:04:08.304Z",
+      "items": [
+        {
+          "id": "d178848c-0cd7-4a87-8d56-f1a838b4d024",
+          "name": "New Item",
+          "description": "Item Description",
+          "method": "POST",
+          "path": "/items",
+          "response": {
+            "name": "New Item",
+            "description": "Item Description"
+          },
+          "status": 200,
+          "headers": {},
+          "delay": 0,
+          "createdAt": "2025-06-16T22:03:08.570Z",
+          "updatedAt": "2025-06-16T22:03:08.570Z"
+        }
+      ]
     }
   },
   "logs": {
@@ -227,6 +289,506 @@
         "body": {
           "message": "Webhook test payload"
         },
+        "query": {}
+      }
+    ],
+    "9abc12b0-5a55-4119-a176-e96b7ee408cf": [
+      {
+        "id": "94afffb3-a4b8-4bc7-ba58-91ad035d5639",
+        "timestamp": "2025-06-16T21:23:09.608Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": null,
+        "query": {}
+      },
+      {
+        "id": "8b52524b-8d20-41af-8d82-fe0dd431555d",
+        "timestamp": "2025-06-16T21:21:56.399Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": null,
+        "query": {}
+      }
+    ],
+    "1fbd0f38-3016-48ad-af88-8c6cf5a7e002": [
+      {
+        "id": "d25abdeb-f424-4db2-89fa-ba61243823c1",
+        "timestamp": "2025-06-16T21:31:52.970Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      },
+      {
+        "id": "f89af6cc-3f85-4230-b45e-e4bf4bd054b2",
+        "timestamp": "2025-06-16T21:23:41.705Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": null,
+        "query": {}
+      }
+    ],
+    "bb569906-4c0a-4d60-bfeb-00260755e769": [
+      {
+        "id": "ceb9679a-7d31-4c4e-9b61-cee9543fcc7e",
+        "timestamp": "2025-06-16T21:29:51.825Z",
+        "method": "PATCH",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "28",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "PATCH request"
+        },
+        "query": {}
+      },
+      {
+        "id": "93c88159-5573-4e0a-9692-9ea549e13251",
+        "timestamp": "2025-06-16T21:29:44.222Z",
+        "method": "PATCH",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "28",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "PATCH request"
+        },
+        "query": {}
+      },
+      {
+        "id": "55984736-94c2-4611-b155-0c365ca1b579",
+        "timestamp": "2025-06-16T21:29:38.691Z",
+        "method": "DELETE",
+        "headers": {
+          "accept": "*/*",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      },
+      {
+        "id": "7d967258-7360-4a17-a9fb-adae07387186",
+        "timestamp": "2025-06-16T21:28:49.310Z",
+        "method": "DELETE",
+        "headers": {
+          "accept": "*/*",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      },
+      {
+        "id": "80408d59-2591-42bc-89f0-4df4afce3a64",
+        "timestamp": "2025-06-16T21:28:25.513Z",
+        "method": "PUT",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "26",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "PUT request"
+        },
+        "query": {}
+      },
+      {
+        "id": "ff1aeb17-0c86-41ce-b20f-bc6c256cf673",
+        "timestamp": "2025-06-16T21:28:14.284Z",
+        "method": "POST",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "27",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "POST request"
+        },
+        "query": {}
+      },
+      {
+        "id": "da221940-0fd8-4f77-a560-b459fb789bb1",
+        "timestamp": "2025-06-16T21:27:56.200Z",
+        "method": "GET",
+        "headers": {
+          "accept": "*/*",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      }
+    ],
+    "bf93444a-1e87-4cc1-b08c-d431e4ebf041": [
+      {
+        "id": "7c11e2d1-a5d6-48b7-9096-41135b858840",
+        "timestamp": "2025-06-16T21:31:10.381Z",
+        "method": "DELETE",
+        "headers": {
+          "accept": "*/*",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      },
+      {
+        "id": "056fa347-f10c-4695-9010-f87b77526b42",
+        "timestamp": "2025-06-16T21:30:56.015Z",
+        "method": "PATCH",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "28",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "PATCH request"
+        },
+        "query": {}
+      },
+      {
+        "id": "70d57265-0837-41bb-b04b-5c19a752b4a4",
+        "timestamp": "2025-06-16T21:30:45.617Z",
+        "method": "PUT",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "26",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "PUT request"
+        },
+        "query": {}
+      },
+      {
+        "id": "47e81897-538e-49eb-969f-33deb961b598",
+        "timestamp": "2025-06-16T21:30:34.995Z",
+        "method": "POST",
+        "headers": {
+          "accept": "*/*",
+          "content-length": "27",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "message": "POST request"
+        },
+        "query": {}
+      },
+      {
+        "id": "be403d3e-e964-4dc5-b6c4-10ed039ed419",
+        "timestamp": "2025-06-16T21:30:22.370Z",
+        "method": "GET",
+        "headers": {
+          "accept": "*/*",
+          "host": "localhost:3000",
+          "user-agent": "curl/8.7.1",
+          "x-forwarded-for": "::1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      }
+    ],
+    "3dd6ddf0-43de-4da1-be13-5f8b46f3d976": [
+      {
+        "id": "337e6a04-5158-46b9-89a7-272c4d3db067",
+        "timestamp": "2025-06-16T21:32:57.709Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      },
+      {
+        "id": "62a1f315-f655-42c8-b9d1-52e64c941a73",
+        "timestamp": "2025-06-16T21:32:15.512Z",
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {}
+      }
+    ],
+    "a196b184-d6ff-443f-ad1d-b2d6fc520ba0": [
+      {
+        "id": "f9a2432d-f88a-407f-879d-3aa6da2bb2fb",
+        "timestamp": "2025-06-16T21:38:32.334Z",
+        "method": "POST",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "319",
+          "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "raw": "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\nContent-Type: text/plain\r\n\r\nThis is a test file content.\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"message\"\r\n\r\nHello from form data\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
+        },
+        "query": {}
+      },
+      {
+        "id": "38efb070-176f-47c6-8cfa-b8504dea5d8b",
+        "timestamp": "2025-06-16T21:38:15.778Z",
+        "method": "GET",
+        "headers": {
+          "accept": "application/json",
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
+        "query": {
+          "event": "test",
+          "source": "api"
+        }
+      },
+      {
+        "id": "8c21e02b-a297-41ad-a45a-7fee7ee542e7",
+        "timestamp": "2025-06-16T21:38:09.018Z",
+        "method": "DELETE",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "54",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "event": "delete",
+          "data": {
+            "id": 123
+          }
+        },
+        "query": {}
+      },
+      {
+        "id": "b27ab3bf-cbb6-4618-a057-eec025a26658",
+        "timestamp": "2025-06-16T21:38:02.963Z",
+        "method": "PUT",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "79",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "event": "update",
+          "data": {
+            "id": 123,
+            "status": "updated"
+          }
+        },
+        "query": {}
+      },
+      {
+        "id": "055943c9-08b4-4f16-9ad5-f30cb169d102",
+        "timestamp": "2025-06-16T21:37:20.085Z",
+        "method": "POST",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "124",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "event": "test",
+          "data": {
+            "message": "Hello from webhook test",
+            "timestamp": "2025-06-16T21:37:20.069Z"
+          }
+        },
+        "query": {}
+      },
+      {
+        "id": "b4e361be-e78c-4868-ad1a-d40da07f79c8",
+        "timestamp": "2025-06-16T21:36:39.099Z",
+        "method": "PUT",
+        "headers": {
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "content-length": "80",
+          "content-type": "application/json",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {
+          "name": "Updated Test Webhook",
+          "description": "An updated test webhook"
+        },
+        "query": {}
+      },
+      {
+        "id": "90584a3b-38cd-454b-abaa-09e4a3f0b79c",
+        "timestamp": "2025-06-16T21:36:21.288Z",
+        "method": "GET",
+        "headers": {
+          "accept": "application/json",
+          "accept-encoding": "gzip, deflate",
+          "connection": "close",
+          "host": "localhost:3000",
+          "user-agent": "vscode-restclient",
+          "x-forwarded-for": "::ffff:127.0.0.1",
+          "x-forwarded-host": "localhost:3000",
+          "x-forwarded-port": "3000",
+          "x-forwarded-proto": "http"
+        },
+        "body": {},
         "query": {}
       }
     ]
