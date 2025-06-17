@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-import type { WebhookLog } from "@/app/lib/webhook-store"
+import type { WebhookLog } from "@/app/lib/db"
 import { Copy, Globe, Clock, Code, FileText, CheckCircle, Activity, ChevronRight } from "lucide-react"
 
 export default function WebhookPage() {

@@ -1,6 +1,6 @@
 ### Variables
 @baseUrl = http://localhost:3000
-@webhookId = a196b184-d6ff-443f-ad1d-b2d6fc520ba0
+@webhookId = a83da3e7-99de-4061-a909-1ffbbde583d2
 
 ### 🔹 Get webhook info (should be GET only, no body allowed)
 GET {{baseUrl}}/api/webhook/{{webhookId}}

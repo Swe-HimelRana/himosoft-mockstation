@@ -1,29 +1,6 @@
 import { apiDb } from './db';
 import crypto from 'crypto';
-
-export interface ApiItem {
-  id: string;
-  name: string;
-  description: string;
-  method: string;
-  path: string;
-  response: any;
-  status: number;
-  headers: Record<string, string>;
-  delay: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ApiInstance {
-  id: string;
-  name: string;
-  description: string;
-  apiKey: string;
-  createdAt: string;
-  lastAccessedAt: string;
-  items: ApiItem[];
-}
+import type { ApiItem, ApiInstance, ApiEndpoint } from './db';
 
 export interface PaginationInfo {
   currentPage: number;
@@ -38,9 +15,31 @@ export interface Instances {
   [key: string]: ApiInstance;
 }
 
+interface EndpointResponse {
+  status: number;
+  body?: any;
+}
+
+interface Endpoint {
+  method: string;
+  path: string;
+  response: EndpointResponse;
+}
+
+interface Item {
+  id: string;
+  name: string;
+  description: string;
+  endpoints: Endpoint[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 class ApiStore {
   private readonly INSTANCE_MAX_AGE = 1000 * 60 * 60 * 24 * 7; // 7 days
   private isCreating = false;
+  private readonly MAX_ITEMS = 100;
+  private readonly MAX_INSTANCES_PER_API = 10;
 
   constructor() {
     // Initialize the database if it doesn't exist
@@ -95,7 +94,7 @@ class ApiStore {
     }
   }
 
-  async createInstance(name: string, description: string): Promise<ApiInstance> {
+  async createInstance(apiId: string, instance: Omit<ApiInstance, 'id' | 'apiId' | 'apiKey' | 'lastAccessedAt' | 'createdAt' | 'updatedAt'>): Promise<ApiInstance> {
     console.log('ApiStore: createInstance called');
     
     // Prevent multiple simultaneous creations
@@ -113,14 +112,15 @@ class ApiStore {
 
       const id = crypto.randomUUID();
       const apiKey = 'temp_' + crypto.randomUUID();
-      const instance: ApiInstance = {
+      const newInstance: ApiInstance = {
         id,
-        name,
-        description,
+        apiId,
+        name: instance.name,
+        description: instance.description,
         apiKey,
         createdAt: new Date().toISOString(),
         lastAccessedAt: new Date().toISOString(),
-        items: []
+        updatedAt: new Date().toISOString()
       };
 
       console.log('ApiStore: Creating new instance:', { id, apiKey });
@@ -131,7 +131,7 @@ class ApiStore {
       console.log('ApiStore: Current instances:', instances);
       
       // Add new instance
-      instances[id] = instance;
+      instances[id] = newInstance;
       
       // Save back to database
       console.log('ApiStore: Saving instance to database...');
@@ -193,212 +193,126 @@ class ApiStore {
     }
   }
 
-  async addItem(apiKey: string, item: any): Promise<ApiInstance | null> {
-    console.log('ApiStore: addItem called for:', apiKey);
+  private fixEndpointPaths(item: ApiItem, instanceId: string): ApiItem {
+    return {
+      ...item,
+      endpoints: item.endpoints.map(endpoint => ({
+        ...endpoint,
+        path: `/items/${instanceId}/${item.id}`
+      }))
+    };
+  }
+
+  async getItems(instanceId?: string): Promise<ApiItem[]> {
     try {
       const data = await apiDb.read();
-      const instance = Object.values(data.instances).find(i => i.apiKey === apiKey);
-      if (instance) {
-        instance.items.push(item);
-        instance.lastAccessedAt = new Date().toISOString();
-        data.instances[instance.id] = instance;
-        await apiDb.write(data);
+      const items = Object.values(data.items || {});
+      if (instanceId) {
+        const filteredItems = items.filter(item => item.endpoints.some(endpoint => 
+          endpoint.path.includes(instanceId)
+        ));
+        // Fix paths for all items
+        return filteredItems.map(item => this.fixEndpointPaths(item, instanceId));
       }
-      return instance || null;
+      return items;
     } catch (error) {
-      console.error('ApiStore: Error adding item:', error);
-      return null;
-    }
-  }
-
-  async getItems(id: string, page: number = 1, limit: number = 10): Promise<{ items: ApiItem[], pagination: PaginationInfo }> {
-    console.log('ApiStore: getItems called for:', id)
-    try {
-      const instance = await this.getInstance(id)
-      if (!instance) return { items: [], pagination: this.getEmptyPagination() }
-
-      const start = (page - 1) * limit
-      const end = start + limit
-      const items = instance.items.slice(start, end)
-      const totalItems = instance.items.length
-      const totalPages = Math.ceil(totalItems / limit)
-
-      return {
-        items,
-        pagination: {
-          currentPage: page,
-          totalPages,
-          totalItems,
-          itemsPerPage: limit,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1
-        }
-      }
-    } catch (error) {
-      console.error('Error getting items:', error)
-      return { items: [], pagination: this.getEmptyPagination() }
-    }
-  }
-
-  getAllInstances(): ApiInstance[] {
-    // Clean up old instances when getting all instances
-    this.cleanup();
-
-    const instances = apiDb.read().instances;
-    return Object.values(instances);
-  }
-
-  async validateApiKey(instanceId: string, apiKey: string): Promise<boolean> {
-    const instance = await this.getInstance(instanceId)
-    if (!instance) {
-      console.log('Instance not found:', instanceId)
-      return false
-    }
-    
-    const isValid = instance.apiKey === apiKey
-    if (!isValid) {
-      console.log('Invalid API key:', {
-        provided: apiKey,
-        expected: instance.apiKey,
-        instanceId
-      })
-    }
-    return isValid
-  }
-
-  async getApiKey(id: string): Promise<string | null> {
-    const instance = await this.getInstance(id)
-    return instance?.apiKey || null
-  }
-
-  async createItem(id: string, data: Omit<ApiItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiItem | undefined> {
-    console.log('ApiStore: createItem called for:', id);
-    try {
-      const instance = await this.getInstance(id);
-      if (!instance) {
-        console.log('ApiStore: Instance not found:', id);
-        return undefined;
-      }
-
-      const item: ApiItem = {
-        id: crypto.randomUUID(),
-        ...data,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      instance.items.push(item);
-      instance.lastAccessedAt = new Date().toISOString();
-
-      const dbData = await apiDb.read();
-      dbData.instances[id] = instance;
-      await apiDb.write(dbData);
-
-      console.log('ApiStore: Created item:', item);
-      return item;
-    } catch (error) {
-      console.error('ApiStore: Error creating item:', error);
-      return undefined;
-    }
-  }
-
-  async getItem(id: string, itemId: string): Promise<ApiItem | undefined> {
-    console.log('ApiStore: getItem called for:', id, itemId);
-    try {
-      const instance = await this.getInstance(id);
-      if (!instance) {
-        console.log('ApiStore: Instance not found:', id);
-        return undefined;
-      }
-
-      const item = instance.items.find(i => i.id === itemId);
-      console.log('ApiStore: Found item:', item);
-      return item;
-    } catch (error) {
-      console.error('ApiStore: Error getting item:', error);
-      return undefined;
-    }
-  }
-
-  async getAllItems(id: string): Promise<ApiItem[]> {
-    console.log('ApiStore: getAllItems called for:', id);
-    try {
-      const instance = await this.getInstance(id);
-      if (!instance) {
-        console.log('ApiStore: Instance not found:', id);
-        return [];
-      }
-
-      console.log('ApiStore: Found items:', instance.items);
-      return instance.items;
-    } catch (error) {
-      console.error('ApiStore: Error getting all items:', error);
+      console.error('Error getting items:', error);
       return [];
     }
   }
 
-  async updateItem(id: string, itemId: string, data: Partial<Omit<ApiItem, 'id' | 'createdAt' | 'updatedAt'>>): Promise<ApiItem | undefined> {
-    console.log('ApiStore: updateItem called for:', id, itemId);
+  async getItem(id: string): Promise<ApiItem | null> {
     try {
-      const instance = await this.getInstance(id);
-      if (!instance) {
-        console.log('ApiStore: Instance not found:', id);
-        return undefined;
-      }
-
-      const itemIndex = instance.items.findIndex(i => i.id === itemId);
-      if (itemIndex === -1) {
-        console.log('ApiStore: Item not found:', itemId);
-        return undefined;
-      }
-
-      const updatedItem = {
-        ...instance.items[itemIndex],
-        ...data,
-        updatedAt: new Date().toISOString()
-      };
-
-      instance.items[itemIndex] = updatedItem;
-      instance.lastAccessedAt = new Date().toISOString();
-
-      const dbData = await apiDb.read();
-      dbData.instances[id] = instance;
-      await apiDb.write(dbData);
-
-      console.log('ApiStore: Updated item:', updatedItem);
-      return updatedItem;
+      const data = await apiDb.read();
+      return data.items[id] || null;
     } catch (error) {
-      console.error('ApiStore: Error updating item:', error);
-      return undefined;
+      console.error('Error getting item:', error);
+      return null;
     }
   }
 
-  async deleteItem(id: string, itemId: string): Promise<boolean> {
-    console.log('ApiStore: deleteItem called for:', id, itemId);
+  async createItem(item: Omit<ApiItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiItem> {
     try {
-      const instance = await this.getInstance(id);
-      if (!instance) {
-        console.log('ApiStore: Instance not found:', id);
+      const data = await apiDb.read();
+      const id = crypto.randomUUID();
+      const newItem: ApiItem = {
+        ...item,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Fix endpoint paths before saving
+      const instanceId = newItem.endpoints[0]?.path.split('/')[2];
+      if (instanceId) {
+        const fixedItem = this.fixEndpointPaths(newItem, instanceId);
+        data.items[id] = fixedItem;
+      } else {
+        data.items[id] = newItem;
+      }
+
+      await apiDb.write(data);
+      return data.items[id];
+    } catch (error) {
+      console.error('Error creating item:', error);
+      throw error;
+    }
+  }
+
+  async updateItem(id: string, item: Partial<ApiItem>): Promise<ApiItem | null> {
+    try {
+      const data = await apiDb.read();
+      const existingItem = data.items[id];
+      
+      if (!existingItem) {
+        return null;
+      }
+
+      // Preserve all existing fields and only update the ones provided
+      const updatedItem: ApiItem = {
+        ...existingItem,
+        ...item,
+        id: existingItem.id, // Ensure ID is preserved
+        createdAt: existingItem.createdAt, // Preserve creation date
+        updatedAt: new Date().toISOString()
+      };
+
+      // Fix endpoint paths before saving
+      const instanceId = updatedItem.endpoints[0]?.path.split('/')[2];
+      if (instanceId) {
+        const fixedItem = this.fixEndpointPaths(updatedItem, instanceId);
+        data.items[id] = fixedItem;
+      } else {
+        data.items[id] = updatedItem;
+      }
+
+      console.log('Updating item:', {
+        id,
+        existing: existingItem,
+        updates: item,
+        result: data.items[id]
+      });
+
+      await apiDb.write(data);
+      return data.items[id];
+    } catch (error) {
+      console.error('Error updating item:', error);
+      return null;
+    }
+  }
+
+  async deleteItem(id: string): Promise<boolean> {
+    try {
+      const data = await apiDb.read();
+      if (!data.items[id]) {
         return false;
       }
 
-      const itemIndex = instance.items.findIndex(i => i.id === itemId);
-      if (itemIndex === -1) {
-        console.log('ApiStore: Item not found:', itemId);
-        return false;
-      }
-
-      instance.items.splice(itemIndex, 1);
-      instance.lastAccessedAt = new Date().toISOString();
-
-      const dbData = await apiDb.read();
-      dbData.instances[id] = instance;
-      await apiDb.write(dbData);
-
-      console.log('ApiStore: Deleted item:', itemId);
+      delete data.items[id];
+      await apiDb.write(data);
       return true;
     } catch (error) {
-      console.error('ApiStore: Error deleting item:', error);
+      console.error('Error deleting item:', error);
       return false;
     }
   }
@@ -412,6 +326,93 @@ class ApiStore {
       hasNextPage: false,
       hasPreviousPage: false
     };
+  }
+
+  async validateApiKey(instanceId: string, apiKey: string): Promise<boolean> {
+    try {
+      const data = await apiDb.read();
+      const instances = data.instances || {};
+      const instance = instances[instanceId];
+      
+      if (!instance) {
+        console.log('Instance not found:', instanceId);
+        return false;
+      }
+
+      const isValid = instance.apiKey === apiKey;
+      
+      if (isValid) {
+        // Update last accessed time
+        instance.lastAccessedAt = new Date().toISOString();
+        await apiDb.write({ ...data, instances });
+      }
+      
+      console.log('API key validation:', {
+        instanceId,
+        isValid,
+        instance: instance ? {
+          id: instance.id,
+          name: instance.name,
+          lastAccessedAt: instance.lastAccessedAt
+        } : null
+      });
+      
+      return isValid;
+    } catch (error) {
+      console.error('Error validating API key:', error);
+      return false;
+    }
+  }
+
+  async getApiKey(id: string): Promise<string | null> {
+    try {
+      const data = await apiDb.read();
+      const instance = data.instances[id];
+      return instance?.apiKey || null;
+    } catch (error) {
+      console.error('Error getting API key:', error);
+      return null;
+    }
+  }
+
+  async updateInstance(id: string, instance: Partial<ApiInstance>): Promise<ApiInstance | null> {
+    try {
+      const data = await apiDb.read();
+      const existingInstance = data.instances[id];
+      
+      if (!existingInstance) {
+        return null;
+      }
+
+      const updatedInstance: ApiInstance = {
+        ...existingInstance,
+        ...instance,
+        updatedAt: new Date().toISOString()
+      };
+
+      data.instances[id] = updatedInstance;
+      await apiDb.write(data);
+      return updatedInstance;
+    } catch (error) {
+      console.error('Error updating instance:', error);
+      return null;
+    }
+  }
+
+  async deleteInstance(id: string): Promise<boolean> {
+    try {
+      const data = await apiDb.read();
+      if (!data.instances[id]) {
+        return false;
+      }
+
+      delete data.instances[id];
+      await apiDb.write(data);
+      return true;
+    } catch (error) {
+      console.error('Error deleting instance:', error);
+      return false;
+    }
   }
 }
 

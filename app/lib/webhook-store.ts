@@ -1,14 +1,4 @@
-import { apiDb } from './db';
-
-export interface WebhookLog {
-  id: string;
-  timestamp: string;
-  method: string;
-  headers: Record<string, string>;
-  body: any;
-  query: Record<string, string>;
-  formData?: FormData;
-}
+import { apiDb, WebhookLog } from './db';
 
 type SubscriberCallback = (logs: WebhookLog[]) => void;
 
@@ -51,20 +41,27 @@ class WebhookStore {
     }
   }
 
-  async addLog(webhookId: string, log: WebhookLog) {
+  async addLog(webhookId: string, log: Omit<WebhookLog, 'id' | 'timestamp'>) {
     // Clean up old logs before adding new one
     await this.cleanup();
 
     const logs = await this.getLogs(webhookId);
     
+    // Create a new log with required fields
+    const newLog: WebhookLog = {
+      ...log,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString()
+    };
+    
     // Check if this log ID already exists
-    const existingLogIndex = logs.findIndex(l => l.id === log.id);
+    const existingLogIndex = logs.findIndex(l => l.id === newLog.id);
     if (existingLogIndex !== -1) {
       // Update existing log instead of adding a duplicate
-      logs[existingLogIndex] = log;
+      logs[existingLogIndex] = newLog;
     } else {
       // Add new log
-      logs.unshift(log);
+      logs.unshift(newLog);
     }
     
     // Keep only the most recent logs
@@ -75,7 +72,7 @@ class WebhookStore {
     await apiDb.write({ ...data, logs: allLogs });
     
     // Notify subscribers with only the new/updated log
-    this.notifySubscribers(webhookId, [log]);
+    this.notifySubscribers(webhookId, [newLog]);
   }
 
   async getLogs(webhookId: string): Promise<WebhookLog[]> {
