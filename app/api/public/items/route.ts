@@ -1,35 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { apiStore } from '@/app/lib/api-store'
+import { apiDb } from '@/app/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
     // Get all instances
-    const instances = await apiStore.getAllInstances()
+    const data = await apiDb.read();
+    const instances = data.instances || {};
     
     // Collect all items from all instances
     const allItems = await Promise.all(
       Object.values(instances).map(async (instance) => {
-        const items = await apiStore.getAllItems(instance.id)
+        const items = await apiStore.getItems();
         return items.map(item => ({
           ...item,
           instanceId: instance.id,
           instanceName: instance.name
-        }))
+        }));
       })
-    )
-
-    // Flatten the array of items
-    const flattenedItems = allItems.flat()
+    );
 
     return NextResponse.json({
-      total: flattenedItems.length,
-      items: flattenedItems
-    })
+      total: allItems.flat().length,
+      items: allItems.flat()
+    });
   } catch (error) {
-    console.error('Error in GET /api/public/items:', error)
+    console.error('Error getting all items:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 } 

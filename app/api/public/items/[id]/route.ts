@@ -6,26 +6,21 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const instance = await apiStore.getInstance(params.id);
-    if (!instance) {
-      return NextResponse.json(
-        { error: 'Instance not found' },
-        { status: 404 }
-      );
-    }
+    const items = await apiStore.getItems(params.id);
+    const simplifiedItems = items.map(({ id, name, description, createdAt, updatedAt }) => ({
+      id,
+      name,
+      description,
+      createdAt,
+      updatedAt
+    }));
 
-    const items = await apiStore.getAllItems(instance.id);
     return NextResponse.json({
-      instance: {
-        id: instance.id,
-        name: instance.name,
-        description: instance.description
-      },
       total: items.length,
-      items: items
+      items: simplifiedItems
     });
   } catch (error) {
-    console.error('Error in GET /api/public/items/[id]:', error);
+    console.error('Error getting items:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -38,36 +33,30 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const instance = await apiStore.getInstance(params.id);
-    if (!instance) {
-      return NextResponse.json(
-        { error: 'Instance not found' },
-        { status: 404 }
-      );
-    }
-
     const body = await request.json();
-    const item = await apiStore.createItem(instance.id, {
+    const item = await apiStore.createItem({
       name: body.name,
       description: body.description,
-      method: 'POST',
-      path: '/items',
-      response: body,
-      status: 200,
-      headers: {},
-      delay: 0
+      endpoints: [{
+        method: 'POST',
+        path: `/items/${params.id}/{itemId}`,
+        response: {
+          status: 201,
+          body: null
+        }
+      }]
     });
 
-    if (!item) {
-      return NextResponse.json(
-        { error: 'Failed to create item' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(item);
+    const { id, name, description, createdAt, updatedAt } = item;
+    return NextResponse.json({
+      id,
+      name,
+      description,
+      createdAt,
+      updatedAt
+    }, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/public/items/[id]:', error);
+    console.error('Error creating item:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

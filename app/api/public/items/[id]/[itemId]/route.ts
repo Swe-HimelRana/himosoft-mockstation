@@ -6,15 +6,9 @@ export async function GET(
   { params }: { params: { id: string; itemId: string } }
 ) {
   try {
-    const instance = await apiStore.getInstance(params.id)
-    if (!instance) {
-      return NextResponse.json(
-        { error: 'Instance not found' },
-        { status: 404 }
-      )
-    }
-
-    const item = await apiStore.getItem(instance.id, params.itemId)
+    const items = await apiStore.getItems(params.id)
+    const item = items.find(i => i.id === params.itemId)
+    
     if (!item) {
       return NextResponse.json(
         { error: 'Item not found' },
@@ -22,7 +16,14 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(item)
+    const { id, name, description, createdAt, updatedAt } = item
+    return NextResponse.json({
+      id,
+      name,
+      description,
+      createdAt,
+      updatedAt
+    })
   } catch (error) {
     console.error('Error in GET /api/public/items/[id]/[itemId]:', error)
     return NextResponse.json(
@@ -37,34 +38,35 @@ export async function PUT(
   { params }: { params: { id: string; itemId: string } }
 ) {
   try {
-    const instance = await apiStore.getInstance(params.id)
-    if (!instance) {
-      return NextResponse.json(
-        { error: 'Instance not found' },
-        { status: 404 }
-      )
-    }
-
     const body = await request.json()
-    const item = await apiStore.updateItem(instance.id, params.itemId, {
+    const updatedItem = await apiStore.updateItem(params.itemId, {
       name: body.name,
       description: body.description,
-      method: 'PUT',
-      path: `/items/${params.itemId}`,
-      response: body,
-      status: 200,
-      headers: {},
-      delay: 0
+      endpoints: [{
+        method: 'PUT',
+        path: `/items/${params.id}/{itemId}`,
+        response: {
+          status: 200,
+          body: null
+        }
+      }]
     })
 
-    if (!item) {
+    if (!updatedItem) {
       return NextResponse.json(
         { error: 'Item not found' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json(item)
+    const { id, name, description, createdAt, updatedAt } = updatedItem
+    return NextResponse.json({
+      id,
+      name,
+      description,
+      createdAt,
+      updatedAt
+    })
   } catch (error) {
     console.error('Error in PUT /api/public/items/[id]/[itemId]:', error)
     return NextResponse.json(
@@ -79,22 +81,13 @@ export async function DELETE(
   { params }: { params: { id: string; itemId: string } }
 ) {
   try {
-    const instance = await apiStore.getInstance(params.id)
-    if (!instance) {
-      return NextResponse.json(
-        { error: 'Instance not found' },
-        { status: 404 }
-      )
-    }
-
-    const success = await apiStore.deleteItem(instance.id, params.itemId)
+    const success = await apiStore.deleteItem(params.itemId)
     if (!success) {
       return NextResponse.json(
         { error: 'Item not found' },
         { status: 404 }
       )
     }
-
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error in DELETE /api/public/items/[id]/[itemId]:', error)

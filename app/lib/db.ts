@@ -7,13 +7,55 @@ const dbPath = path.join(dataDir, 'api.json')
 
 // Types
 export interface DbSchema {
-  items: Record<string, any>
-  instances: Record<string, any>
-  logs: Record<string, any[]>
+  items: Record<string, ApiItem>;
+  instances: Record<string, ApiInstance>;
+  logs: Record<string, WebhookLog[]>;
+}
+
+export interface ApiItem {
+  id: string;
+  name: string;
+  description: string;
+  endpoints: ApiEndpoint[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiEndpoint {
+  path: string;
+  method: string;
+  response: {
+    status: number;
+    body: any;
+  };
+}
+
+export interface ApiInstance {
+  id: string;
+  apiId: string;
+  name: string;
+  description: string;
+  apiKey: string;
+  lastAccessedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WebhookLog {
+  id: string;
+  timestamp: string;
+  method: string;
+  path: string;
+  headers: Record<string, string>;
+  body: any;
+  response: {
+    status: number;
+    body: any;
+  };
 }
 
 // Initialize database
-async function initializeDb() {
+async function initDb() {
   try {
     await fs.mkdir(dataDir, { recursive: true })
     try {
@@ -29,7 +71,7 @@ async function initializeDb() {
 }
 
 // Initialize database on module load
-initializeDb().catch(console.error)
+initDb().catch(console.error)
 
 // Database operations
 export const apiDb = {
@@ -39,7 +81,7 @@ export const apiDb = {
       return JSON.parse(data) as DbSchema
     } catch (error) {
       console.error('Error reading database:', error)
-      throw error
+      return { items: {}, instances: {}, logs: {} } as DbSchema
     }
   },
 
@@ -50,16 +92,5 @@ export const apiDb = {
       console.error('Error writing to database:', error)
       throw error
     }
-  },
-
-  get: async (key: string) => {
-    const data = await apiDb.read()
-    return data[key as keyof DbSchema]
-  },
-
-  set: async (key: string, value: any) => {
-    const data = await apiDb.read()
-    data[key as keyof DbSchema] = value
-    await apiDb.write(data)
   }
 } 

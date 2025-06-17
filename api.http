@@ -1,8 +1,8 @@
 ### 🔧 Environment Variables
 @baseUrl = http://localhost:3000
-@instanceId = 431bfec3-a28f-42a3-a580-485b6772ca39
-@apiKey = temp_1dc1dbb9-9fca-4342-93aa-5a15670b7731
-@itemId = 28e2f5ca-2281-456c-9b76-cb594fd20964
+@instanceId =a4743799-eeb9-4a05-b631-09b65d2cf788 
+@apiKey = temp_ae2a4479-0285-43d0-839e-edda9aed095c
+@itemId = df00b331-ddd6-47a0-bc17-bd2e88e7f901
 
 ##############################################################
 ### 🔐 Authenticated Private Endpoints (Require x-api-key)
@@ -33,7 +33,7 @@ x-api-key: {{apiKey}}
 
 {
   "name": "Updated Item",
-  "description": "welcome from himosoft"
+  "description": "welcome from himosoft public"
 }
 
 ### 🔹 Delete Item (Private)

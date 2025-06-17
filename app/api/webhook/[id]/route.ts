@@ -3,24 +3,28 @@ import { webhookStore } from '@/app/lib/webhook-store';
 
 async function handleRequest(request: NextRequest, method: string, params: { id: string }) {
   try {
-    const headers = Object.fromEntries(request.headers.entries());
-    const query = Object.fromEntries(new URL(request.url).searchParams.entries());
-    const body = await request.text();
-    let parsedBody: any = {};
-    
-    try {
-      parsedBody = body ? JSON.parse(body) : {};
-    } catch (e) {
-      parsedBody = { raw: body };
-    }
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+
+    const parsedBody = await request.json().catch(() => ({}));
+    const url = new URL(request.url);
+    const query: Record<string, string> = {};
+    url.searchParams.forEach((value, key) => {
+      query[key] = value;
+    });
 
     const log = {
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
       method,
       headers,
       body: parsedBody,
       query,
+      path: url.pathname,
+      response: {
+        status: 200,
+        body: { success: true }
+      }
     };
 
     await webhookStore.addLog(params.id, log);
@@ -54,4 +58,4 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   return handleRequest(request, 'DELETE', params);
-} 
+}

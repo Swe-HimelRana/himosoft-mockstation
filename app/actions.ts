@@ -15,7 +15,10 @@ export async function createNewInstance() {
   
   try {
     console.log('Server action: Creating instance...');
-    const instance = await apiStore.createInstance('New Instance', 'A new mock API instance');
+    const instance = await apiStore.createInstance('main', {
+      name: 'New Instance',
+      description: 'A new mock API instance'
+    });
     console.log('Server action: Instance created successfully:', instance.id);
     
     // Return the instance ID instead of redirecting
